@@ -13,12 +13,33 @@
 
 - (void)awakeFromNib
 {
-	//Create the NSStatusBar and set its length
+    // Add app to login items    
+    LSSharedFileListRef loginItemsListRef = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
+    NSURL *bundleURL = [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
+    
+    NSDictionary *properties = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES]
+                                             forKey:@"com.apple.loginitem.HideOnLaunch"];
+    
+    LSSharedFileListItemRef itemRef = LSSharedFileListInsertItemURL(loginItemsListRef,
+                                            kLSSharedFileListItemLast,
+                                            NULL,
+                                            NULL,
+                                            (CFURLRef)bundleURL,
+                                            (CFDictionaryRef)properties,
+                                            NULL);
+    if (itemRef) {
+        CFRelease(itemRef);
+    }
+    if (loginItemsListRef) {
+        CFRelease(loginItemsListRef);
+    }
+    
+	// Create the NSStatusBar and set its length
 	statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength] retain];
 	
-	//Setup the statusItem
-	[statusItem setTitle:[NSString stringWithFormat:@"%C", 0x2a4e]];
-	[statusItem setToolTip:@"Someone open the damn door already!!!"];
+	// Setup the statusItem
+	[statusItem setTitle:[NSString stringWithFormat:@"🔑"]];
+	[statusItem setToolTip:@"Mach mal einer die Tür auf"];
 	[statusItem setAction:@selector(openDoor:)];
 	[statusItem setTarget:self];
 	[statusItem setHighlightMode:YES];
@@ -36,7 +57,7 @@
 	
 	// Setup a request
   // TODO investigate and use local domain name again, http://door/...
-	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://192.168.2.5/letmein"] 
+	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://10.0.0.64/letmein.html"] 
                                                          cachePolicy:NSURLRequestReloadIgnoringCacheData 
                                                      timeoutInterval:5.0];
 	[request setHTTPMethod:@"GET"];
@@ -62,7 +83,7 @@
     //NSLog(@"Connection Error - %@ %@",
     //      [error localizedDescription]);
 	
-	NSBeginAlertSheet(@"Connection to Doorduino failed.", @"OK", nil, nil, nil, self, nil, nil, nil, @"");
+	NSBeginAlertSheet(@"Verbindungsproblem:\nEntweder bist du offline - oder die Tür.", @"OK", nil, nil, nil, self, nil, nil, nil, @"");
 }
 
 @end

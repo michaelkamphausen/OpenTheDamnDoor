@@ -12,7 +12,7 @@
 @interface AppController : NSObject
 {
 	NSStatusItem *statusItem;
-  NSConnection *connection;
+    NSURLConnection *connection;
 }
 
 - (IBAction)openDoor:(id)sender;
